@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<head> 
+    <meta charset="utf-8">
+    <title>chart app</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+</head>
+
+<body class="container-fluid">
+    <center class="row">
+        <h1>Blood Pressure Data Each Day:</h1>
+    </center>
+    <hr>
+    <div class="row">
+        <div class="col-md-6">
+            <canvas id="bloodpressure1"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="bp-bargraph1"></canvas>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-md-6">
+            <canvas id="bloodpressure2"></canvas>
+        </div>
+        <div class="col-md-6">
+            <canvas id="bp-bargraph2"></canvas>
+        </div>
+    </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+
+<script>
+    var endpoint = '/api';
+    $.ajax({
+        method : "GET",
+        url : endpoint,
+        success : function(data) {
+            console.log(data)
+            data1 = {
+                'labels': data.labels,
+                'chartLabel': data.chartLabel,
+                'chartdata': data.chartdata
+            }
+            LineChart(data1 , 'bloodpressure1');
+            BarGraph(data1, 'bp-bargraph1')
+            data2 = {
+                'labels': data.labels,
+                'chartLabel': 'blood pressure sample (2)',
+                'chartdata': data.chartdata2
+            }
+            LineChart(data2 , 'bloodpressure2');
+            BarGraph(data2, 'bp-bargraph2')
+        } ,
+        error : function(error_data){
+            console.log(error_data);
+        }
+    })
+
+    function LineChart(data, id) {
+      var labels = data.labels;
+      var chartLabel = data.chartLabel;
+      var chartdata = data.chartdata;
+      var ctx = document.getElementById(id).getContext('2d');
+      var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: chartLabel,
+                    backgroundColor: 'rgb(255, 50, 150)',
+                    borderColor: 'rgb(50, 100, 150)',
+                    data: chartdata,
+                }]
+            },
+        options: {
+                scales: {
+                    xAxes: [{display: true}],
+                    yAxes: [{ticks:{beginAtZero: true}}]
+                }
+            }
+        });
+    }
+    function BarGraph(data, id){
+      var array = [];
+      for (let i = 0; i < data.chartdata.length; i++){
+          array.push('rgb(255, 50, 150)')
+      }
+      var array2 = [];
+      for (let i = 0; i < data.chartdata.length; i++){
+          array2.push('rgb(50, 100, 150)')
+      }
+      var labels = data.labels;
+      var chartLabel = data.chartLabel;
+      var chartdata = data.chartdata;
+      var ctx = document.getElementById(id).getContext('2d');
+      var chart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'bar-graph for blood pressure smaples',
+                    backgroundColor: array,
+                    borderColor: array2,
+                    data: chartdata,
+                }]
+            },
+        options: {
+                scales: {
+                    yAxes: [{ticks:{beginAtZero: true}}]
+                }
+            }
+        });
+    }        
+
+</script>
